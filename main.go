@@ -47,7 +47,7 @@ func writeJsonResponse(writer http.ResponseWriter, statusCode int, data interfac
 	if err != nil {
 		return err
 	}
-	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
 	writer.WriteHeader(statusCode)
 	writer.Write(json)
 	return nil
