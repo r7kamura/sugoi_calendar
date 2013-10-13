@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/r7kamura/router"
 	"net/http"
 	_ "github.com/go-sql-driver/mysql"
@@ -25,10 +24,7 @@ func TitleIndexHandler(writer http.ResponseWriter, request *http.Request) {
 	for _, record := range records {
 		titles = append(titles, *record.(*Title))
 	}
-	fmt.Fprintln(
-		writer,
-		titles,
-	)
+	writeJsonResponse(writer, 200, titles)
 }
 
 func TitleCreateHandler(writer http.ResponseWriter, request *http.Request) {
@@ -37,19 +33,28 @@ func TitleCreateHandler(writer http.ResponseWriter, request *http.Request) {
 		writeJsonErrorResponse(writer, 400, "title parameter is required")
 		return
 	}
-	titleRecord := &Title{Title: titleParam}
-	err := dbMap.Insert(titleRecord)
+	title := &Title{Title: titleParam}
+	err := dbMap.Insert(title)
 	if err != nil {
 		writeJsonErrorResponse(writer, 500, "Failed to insert a new title")
 		return
 	}
-	fmt.Fprintf(writer, "%t\n", titleRecord)
+	writeJsonResponse(writer, 201, title)
 }
 
-func writeJsonErrorResponse(writer http.ResponseWriter, statusCode int, message string) {
-	writer.WriteHeader(statusCode)
-	json, _ := json.Marshal(NewErrorResponseBody(message))
+func writeJsonResponse(writer http.ResponseWriter, statusCode int, data interface{}) error {
+	json, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	writer.Header().Set("Content-Type", "application/json")
 	writer.Write(json)
+	writer.WriteHeader(statusCode)
+	return nil
+}
+
+func writeJsonErrorResponse(writer http.ResponseWriter, statusCode int, message string) error {
+	return writeJsonResponse(writer, statusCode, NewErrorResponseBody(message))
 }
 
 type ErrorResponseBody struct {
