@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/r7kamura/router"
 	"net/http"
-	"strconv"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -18,7 +18,7 @@ func main() {
 func TitleIndexHandler(writer http.ResponseWriter, request *http.Request) {
 	records, err := dbMap.Select(Title{}, `SELECT * FROM titles ORDER BY id DESC`)
 	if err != nil {
-		writer.WriteHeader(500)
+		writeJsonErrorResponse(writer, 500, "Failed to load titles from database")
 		return
 	}
 	titles := []Title{}
@@ -34,27 +34,28 @@ func TitleIndexHandler(writer http.ResponseWriter, request *http.Request) {
 func TitleCreateHandler(writer http.ResponseWriter, request *http.Request) {
 	titleParam := request.FormValue("title")
 	if titleParam == "" {
-		writer.WriteHeader(400)
+		writeJsonErrorResponse(writer, 400, "title parameter is required")
 		return
 	}
-	idParam := request.FormValue("id")
-	if idParam == "" {
-		writer.WriteHeader(400)
-		return
-	}
-	id, err := strconv.Atoi(idParam)
+	titleRecord := &Title{Title: titleParam}
+	err := dbMap.Insert(titleRecord)
 	if err != nil {
-		writer.WriteHeader(400)
-		return
-	}
-	titleRecord := &Title{
-		ID: id,
-		Title: titleParam,
-	}
-	err = dbMap.Insert(titleRecord)
-	if err != nil {
-		writer.WriteHeader(500)
+		writeJsonErrorResponse(writer, 500, "Failed to insert a new title")
 		return
 	}
 	fmt.Fprintf(writer, "%t\n", titleRecord)
+}
+
+func writeJsonErrorResponse(writer http.ResponseWriter, statusCode int, message string) {
+	writer.WriteHeader(statusCode)
+	json, _ := json.Marshal(NewErrorResponseBody(message))
+	writer.Write(json)
+}
+
+type ErrorResponseBody struct {
+	Message string `json:"message"`
+}
+
+func NewErrorResponseBody(message string) ErrorResponseBody {
+	return ErrorResponseBody{Message: message}
 }
