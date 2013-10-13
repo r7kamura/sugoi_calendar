@@ -20,9 +20,9 @@ func TitleIndexHandler(writer http.ResponseWriter, request *http.Request) {
 		writeJsonErrorResponse(writer, 500, "Failed to load titles from database")
 		return
 	}
-	titles := []Title{}
-	for _, record := range records {
-		titles = append(titles, *record.(*Title))
+	titles := make([]Title, len(records))
+	for i, record := range records {
+		titles[i] = *record.(*Title)
 	}
 	writeJsonResponse(writer, 200, titles)
 }
