@@ -10,8 +10,8 @@ import (
 
 func main() {
 	router := router.NewRouter()
-	router.Get("/titles", http.HandlerFunc(TitleIndexHandler))
-	router.Post("/titles", http.HandlerFunc(TitleCreateHandler))
+	router.Get("/titles", TitleIndexHandler)
+	router.Post("/titles", TitleCreateHandler)
 	http.ListenAndServe(":3000", router)
 }
 
