@@ -48,8 +48,8 @@ func writeJsonResponse(writer http.ResponseWriter, statusCode int, data interfac
 		return err
 	}
 	writer.Header().Set("Content-Type", "application/json")
-	writer.Write(json)
 	writer.WriteHeader(statusCode)
+	writer.Write(json)
 	return nil
 }
 
