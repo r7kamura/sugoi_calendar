@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -89,11 +90,31 @@ func TestSugoiCalendarHandler(t *testing.T) {
 			dbMap.CreateTables()
 		})
 
-		It("creates a new title record & returns it", func() {
-			response, _ := http.PostForm(server.URL + "/titles", url.Values{"title": []string{"testTitle"}})
-			Expect(response.StatusCode).To(Equal, 201)
-			Expect(response.Header).To(HaveJSONContentType)
-			Expect(response.Body).To(BeReadableAs, `{"ID":1,"Title":"testTitle"}`)
+		Context("with JSON encoded request body", func() {
+			It("creates a new title record & returns it", func() {
+				response, _ := http.Post(server.URL + "/titles", "application/json", strings.NewReader(`{"title":"testTitle"}`))
+				Expect(response.StatusCode).To(Equal, 201)
+				Expect(response.Header).To(HaveJSONContentType)
+				Expect(response.Body).To(BeReadableAs, `{"ID":1,"Title":"testTitle"}`)
+			})
+		})
+
+		Context("without title parameter", func() {
+			It("returns 400 error", func() {
+				response, _ := http.Post(server.URL + "/titles", "application/json", strings.NewReader(`{}`))
+				Expect(response.StatusCode).To(Equal, 400)
+				Expect(response.Header).To(HaveJSONContentType)
+				Expect(response.Body).To(BeReadableAs, `{"message":"title parameter is required"}`)
+			})
+		})
+
+		Context("with URL encoded request body", func() {
+			It("returns 406 error", func() {
+				response, _ := http.PostForm(server.URL + "/titles", url.Values{"title": []string{"testTitle"}})
+				Expect(response.StatusCode).To(Equal, 406)
+				Expect(response.Header).To(HaveJSONContentType)
+				Expect(response.Body).To(BeReadableAs, `{"message":"Request body must be a JSON encoded value"}`)
+			})
 		})
 	})
 }

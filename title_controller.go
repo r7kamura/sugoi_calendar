@@ -1,6 +1,9 @@
 package main
 
-import "strconv"
+import (
+	"encoding/json"
+	"strconv"
+)
 
 type TitleController struct {
 	Controller
@@ -38,16 +41,26 @@ func (controller TitleController) Show() {
 }
 
 func (controller TitleController) Create() {
-	titleParam := controller.Request.FormValue("title")
-	if titleParam == "" {
+	var jsonTitle JSONTitle
+	decoder := json.NewDecoder(controller.Request.Body)
+	err := decoder.Decode(&jsonTitle)
+	if err != nil {
+		controller.RenderErrorJson(406, "Request body must be a JSON encoded value")
+		return
+	}
+	if jsonTitle.Title == "" {
 		controller.RenderErrorJson(400, "title parameter is required")
 		return
 	}
-	title := &Title{Title: titleParam}
-	err := dbMap.Insert(title)
+	title := &Title{Title: jsonTitle.Title}
+	err = dbMap.Insert(title)
 	if err != nil {
 		controller.RenderErrorJson(500, "Failed to insert a new title")
 		return
 	}
 	controller.RenderJson(201, title)
+}
+
+type JSONTitle struct {
+	Title string `json:"title"`
 }
