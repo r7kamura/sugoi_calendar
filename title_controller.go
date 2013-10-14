@@ -48,11 +48,11 @@ func (controller TitleController) Create() {
 		controller.RenderErrorJson(406, "Request body must be a JSON encoded value")
 		return
 	}
-	if givenTitle.Title == "" {
+	if givenTitle.Name == "" {
 		controller.RenderErrorJson(400, "title parameter is required")
 		return
 	}
-	title := &Title{Title: givenTitle.Title}
+	title := &Title{Name: givenTitle.Name}
 	err = dbMap.Insert(title)
 	if err != nil {
 		controller.RenderErrorJson(500, "Failed to insert a new title")
@@ -62,15 +62,11 @@ func (controller TitleController) Create() {
 }
 
 type GivenTitle struct {
+	Abbreviation string `json:"abbreviation"`
 	CategoryID   int    `json:"category_id"`
 	Comment      string `json:"comment"`
-	ID           int    `json:"id"`
-	Keywords     string `json:"keywords"`
-	ShortTitle   string `json:"short_title"`
-	SubTitles    string `json:"sub_titles"`
-	Title        string `json:"title"`
-	TitleEnglish string `json:"title_english"`
-	TitleFlag    string `json:"title_flag"`
-	TitleYomi    string `json:"title_yomi"`
+	English      string `json:"english"`
+	Hiragana     string `json:"hiragana"`
+	Name         string `json:"name"`
 	UpdatedAt    string `json:"updated_at"`
 }

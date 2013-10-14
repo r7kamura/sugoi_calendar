@@ -16,6 +16,12 @@ func BeReadableAs(values ...interface{}) string {
 	return Equal(string(data), values[1])
 }
 
+func BeReadableLike(values ...interface{}) string {
+	withoutLineBreaks := strings.Replace(values[1].(string), "\n", "", -1)
+	withoutTabs := strings.Replace(withoutLineBreaks, "\t", "", -1)
+	return BeReadableAs(values[0], withoutTabs)
+}
+
 func HaveJSONContentType(values ...interface{}) string {
 	return Equal(values[0].(http.Header).Get("Content-Type"), "application/json; charset=utf-8")
 }
@@ -28,14 +34,27 @@ func TestSugoiCalendarHandler(t *testing.T) {
 		Before(func() {
 			dbMap.DropTablesIfExists()
 			dbMap.CreateTablesIfNotExists()
-			dbMap.Insert(&Title{Title: "testTitle"})
+			dbMap.Insert(&Title{Name: "test"})
 		})
 
 		It("returns titles as JSON", func() {
 			response, _ := http.Get(server.URL + "/titles")
 			Expect(response.StatusCode).To(Equal, 200)
 			Expect(response.Header).To(HaveJSONContentType)
-			Expect(response.Body).To(BeReadableAs, `[{"id":1,"title":"testTitle"}]`)
+			Expect(response.Body).To(BeReadableLike, `
+				[
+					{
+						"abbreviation":"",
+						"category_id":0,
+						"comment":"",
+						"english":"",
+						"hiragana":"",
+						"id":1,
+						"name":"test",
+						"updated_at":""
+					}
+				]`,
+			)
 		})
 	})
 
@@ -43,7 +62,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 		Before(func() {
 			dbMap.DropTablesIfExists()
 			dbMap.CreateTables()
-			dbMap.Insert(&Title{Title: "testTitle"})
+			dbMap.Insert(&Title{Name: "test"})
 		})
 
 		Context("with non-integer id", func() {
@@ -78,7 +97,18 @@ func TestSugoiCalendarHandler(t *testing.T) {
 				response, _ := http.Get(server.URL + "/titles/1")
 				Expect(response.StatusCode).To(Equal, 200)
 				Expect(response.Header).To(HaveJSONContentType)
-				Expect(response.Body).To(BeReadableAs, `{"id":1,"title":"testTitle"}`)
+				Expect(response.Body).To(BeReadableLike, `
+					{
+						"abbreviation":"",
+						"category_id":0,
+						"comment":"",
+						"english":"",
+						"hiragana":"",
+						"id":1,
+						"name":"test",
+						"updated_at":""
+					}`,
+				)
 			})
 		})
 	})
@@ -87,15 +117,6 @@ func TestSugoiCalendarHandler(t *testing.T) {
 		Before(func() {
 			dbMap.DropTablesIfExists()
 			dbMap.CreateTables()
-		})
-
-		Context("with JSON encoded request body", func() {
-			It("creates a new title record & returns it", func() {
-				response, _ := http.Post(server.URL + "/titles", "application/json", strings.NewReader(`{"title":"testTitle"}`))
-				Expect(response.StatusCode).To(Equal, 201)
-				Expect(response.Header).To(HaveJSONContentType)
-				Expect(response.Body).To(BeReadableAs, `{"id":1,"title":"testTitle"}`)
-			})
 		})
 
 		Context("without title parameter", func() {
@@ -109,10 +130,30 @@ func TestSugoiCalendarHandler(t *testing.T) {
 
 		Context("with URL encoded request body", func() {
 			It("returns 406 error", func() {
-				response, _ := http.PostForm(server.URL + "/titles", url.Values{"title": []string{"testTitle"}})
+				response, _ := http.PostForm(server.URL + "/titles", url.Values{"name": []string{"test"}})
 				Expect(response.StatusCode).To(Equal, 406)
 				Expect(response.Header).To(HaveJSONContentType)
 				Expect(response.Body).To(BeReadableAs, `{"message":"Request body must be a JSON encoded value"}`)
+			})
+		})
+
+		Context("with JSON encoded request body", func() {
+			It("creates a new title record & returns it", func() {
+				response, _ := http.Post(server.URL + "/titles", "application/json", strings.NewReader(`{"name":"test"}`))
+				Expect(response.StatusCode).To(Equal, 201)
+				Expect(response.Header).To(HaveJSONContentType)
+				Expect(response.Body).To(BeReadableLike, `
+					{
+						"abbreviation":"",
+						"category_id":0,
+						"comment":"",
+						"english":"",
+						"hiragana":"",
+						"id":1,
+						"name":"test",
+						"updated_at":""
+					}`,
+				)
 			})
 		})
 	})

@@ -24,6 +24,12 @@ func init() {
 }
 
 type Title struct {
-	ID    int    `db:"id" json:"id"`
-	Title string `db:"title" json:"title"`
+	Abbreviation string `db:"abbreviation" json:"abbreviation"`
+	CategoryID   int    `db:"category_id"  json:"category_id"`
+	Comment      string `db:"comment"      json:"comment"`
+	English      string `db:"english"      json:"english"`
+	Hiragana     string `db:"hiragana"     json:"hiragana"`
+	ID           int    `db:"id"           json:"id"`
+	Name         string `db:"name"         json:"name"`
+	UpdatedAt    string `db:"updated_at"   json:"updated_at"`
 }
