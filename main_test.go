@@ -24,9 +24,12 @@ func TestSugoiCalendarHandler(t *testing.T) {
 	defer server.Close()
 
 	Describe(t, "GET /titles", func() {
-		dbMap.DropTablesIfExists()
-		dbMap.CreateTables()
-		dbMap.Insert(&Title{Title: "testTitle"})
+		Before(func() {
+			dbMap.DropTablesIfExists()
+			dbMap.CreateTablesIfNotExists()
+			dbMap.Insert(&Title{Title: "testTitle"})
+		})
+
 
 		It("returns titles as JSON", func() {
 			response, _ := http.Get(server.URL + "/titles")
@@ -37,9 +40,11 @@ func TestSugoiCalendarHandler(t *testing.T) {
 	})
 
 	Describe(t, "GET /titles/:id", func() {
-		dbMap.DropTablesIfExists()
-		dbMap.CreateTables()
-		dbMap.Insert(&Title{Title: "testTitle"})
+		Before(func() {
+			dbMap.DropTablesIfExists()
+			dbMap.CreateTables()
+			dbMap.Insert(&Title{Title: "testTitle"})
+		})
 
 		Context("with non-integer id", func() {
 			It("returns 400 error", func() {
@@ -79,8 +84,10 @@ func TestSugoiCalendarHandler(t *testing.T) {
 	})
 
 	Describe(t, "POST /titles", func() {
-		dbMap.DropTablesIfExists()
-		dbMap.CreateTables()
+		Before(func() {
+			dbMap.DropTablesIfExists()
+			dbMap.CreateTables()
+		})
 
 		It("creates a new title record & returns it", func() {
 			response, _ := http.PostForm(server.URL + "/titles", url.Values{"title": []string{"testTitle"}})
