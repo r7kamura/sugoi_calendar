@@ -24,6 +24,6 @@ func init() {
 }
 
 type Title struct {
-	ID    int    `db:"id"`
-	Title string `db:"title"`
+	ID    int    `db:"id" json:"id"`
+	Title string `db:"title" json:"title"`
 }

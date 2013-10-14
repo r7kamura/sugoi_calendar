@@ -31,12 +31,11 @@ func TestSugoiCalendarHandler(t *testing.T) {
 			dbMap.Insert(&Title{Title: "testTitle"})
 		})
 
-
 		It("returns titles as JSON", func() {
 			response, _ := http.Get(server.URL + "/titles")
 			Expect(response.StatusCode).To(Equal, 200)
 			Expect(response.Header).To(HaveJSONContentType)
-			Expect(response.Body).To(BeReadableAs, `[{"ID":1,"Title":"testTitle"}]`)
+			Expect(response.Body).To(BeReadableAs, `[{"id":1,"title":"testTitle"}]`)
 		})
 	})
 
@@ -79,7 +78,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 				response, _ := http.Get(server.URL + "/titles/1")
 				Expect(response.StatusCode).To(Equal, 200)
 				Expect(response.Header).To(HaveJSONContentType)
-				Expect(response.Body).To(BeReadableAs, `{"ID":1,"Title":"testTitle"}`)
+				Expect(response.Body).To(BeReadableAs, `{"id":1,"title":"testTitle"}`)
 			})
 		})
 	})
@@ -95,7 +94,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 				response, _ := http.Post(server.URL + "/titles", "application/json", strings.NewReader(`{"title":"testTitle"}`))
 				Expect(response.StatusCode).To(Equal, 201)
 				Expect(response.Header).To(HaveJSONContentType)
-				Expect(response.Body).To(BeReadableAs, `{"ID":1,"Title":"testTitle"}`)
+				Expect(response.Body).To(BeReadableAs, `{"id":1,"title":"testTitle"}`)
 			})
 		})
 
