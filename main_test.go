@@ -9,7 +9,18 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 )
+
+func init() {
+	clock = DummyClock{}
+}
+
+type DummyClock struct {}
+
+func (clock DummyClock) Now() time.Time {
+	return time.Unix(0, 0)
+}
 
 func BeReadableAs(values ...interface{}) string {
 	data, _ := ioutil.ReadAll(values[0].(io.Reader))
@@ -51,7 +62,9 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"hiragana":"",
 						"id":1,
 						"name":"test",
-						"updated_at":""
+						"updated_in_syobocal_at":"",
+						"created_at":"1970-01-01T09:00:00+09:00",
+						"updated_at":"1970-01-01T09:00:00+09:00"
 					}
 				]`,
 			)
@@ -106,7 +119,9 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"hiragana":"",
 						"id":1,
 						"name":"test",
-						"updated_at":""
+						"updated_in_syobocal_at":"",
+						"created_at":"1970-01-01T09:00:00+09:00",
+						"updated_at":"1970-01-01T09:00:00+09:00"
 					}`,
 				)
 			})
@@ -151,7 +166,9 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"hiragana":"",
 						"id":1,
 						"name":"test",
-						"updated_at":""
+						"updated_in_syobocal_at":"",
+						"created_at":"1970-01-01T09:00:00+09:00",
+						"updated_at":"1970-01-01T09:00:00+09:00"
 					}`,
 				)
 			})
