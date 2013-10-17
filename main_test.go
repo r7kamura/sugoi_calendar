@@ -58,13 +58,13 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"abbreviation":"",
 						"category_id":0,
 						"comment":"",
+						"created_at":"1970-01-01T09:00:00+09:00",
 						"english":"",
 						"hiragana":"",
 						"id":1,
 						"name":"test",
-						"updated_in_syobocal_at":"",
-						"created_at":"1970-01-01T09:00:00+09:00",
-						"updated_at":"1970-01-01T09:00:00+09:00"
+						"updated_at":"1970-01-01T09:00:00+09:00",
+						"updated_in_syobocal_at":""
 					}
 				]`,
 			)
@@ -115,13 +115,13 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"abbreviation":"",
 						"category_id":0,
 						"comment":"",
+						"created_at":"1970-01-01T09:00:00+09:00",
 						"english":"",
 						"hiragana":"",
 						"id":1,
 						"name":"test",
-						"updated_in_syobocal_at":"",
-						"created_at":"1970-01-01T09:00:00+09:00",
-						"updated_at":"1970-01-01T09:00:00+09:00"
+						"updated_at":"1970-01-01T09:00:00+09:00",
+						"updated_in_syobocal_at":""
 					}`,
 				)
 			})
@@ -154,21 +154,34 @@ func TestSugoiCalendarHandler(t *testing.T) {
 
 		Context("with JSON encoded request body", func() {
 			It("creates a new title record & returns it", func() {
-				response, _ := http.Post(server.URL + "/titles", "application/json", strings.NewReader(`{"name":"test"}`))
+				response, _ := http.Post(
+					server.URL + "/titles", "application/json",
+					strings.NewReader(
+						`{
+							"abbreviation":"t",
+							"category_id":0,
+							"comment":"comment",
+							"english":"test",
+							"hiragana":"てすと",
+							"name":"test",
+							"updated_in_syobocal_at":""
+						}`,
+					),
+				)
 				Expect(response.StatusCode).To(Equal, 201)
 				Expect(response.Header).To(HaveJSONContentType)
 				Expect(response.Body).To(BeReadableLike, `
 					{
-						"abbreviation":"",
+						"abbreviation":"t",
 						"category_id":0,
-						"comment":"",
-						"english":"",
-						"hiragana":"",
+						"comment":"comment",
+						"created_at":"1970-01-01T09:00:00+09:00",
+						"english":"test",
+						"hiragana":"てすと",
 						"id":1,
 						"name":"test",
-						"updated_in_syobocal_at":"",
-						"created_at":"1970-01-01T09:00:00+09:00",
-						"updated_at":"1970-01-01T09:00:00+09:00"
+						"updated_at":"1970-01-01T09:00:00+09:00",
+						"updated_in_syobocal_at":""
 					}`,
 				)
 			})

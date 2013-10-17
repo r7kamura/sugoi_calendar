@@ -52,7 +52,15 @@ func (controller TitleController) Create() {
 		controller.RenderErrorJson(400, "title parameter is required")
 		return
 	}
-	title := &Title{Name: givenTitle.Name}
+	title := &Title{
+		Abbreviation: givenTitle.Abbreviation,
+		CategoryID: givenTitle.CategoryID,
+		Comment: givenTitle.Comment,
+		English: givenTitle.English,
+		Hiragana: givenTitle.Hiragana,
+		Name: givenTitle.Name,
+		UpdatedInSyobocalAt: givenTitle.UpdatedInSyobocalAt,
+	}
 	err = dbMap.Insert(title)
 	if err != nil {
 		controller.RenderErrorJson(500, "Failed to insert a new title")

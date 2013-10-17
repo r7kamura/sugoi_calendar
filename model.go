@@ -28,13 +28,13 @@ type Title struct {
 	Abbreviation        string    `db:"abbreviation"           json:"abbreviation"`
 	CategoryID          int       `db:"category_id"            json:"category_id"`
 	Comment             string    `db:"comment"                json:"comment"`
+	CreatedAt           time.Time `db:"created_at"             json:"created_at"`
 	English             string    `db:"english"                json:"english"`
 	Hiragana            string    `db:"hiragana"               json:"hiragana"`
 	ID                  int       `db:"id"                     json:"id"`
 	Name                string    `db:"name"                   json:"name"`
-	UpdatedInSyobocalAt string    `db:"updated_in_syobocal_at" json:"updated_in_syobocal_at"`
-	CreatedAt           time.Time `db:"created_at"             json:"created_at"`
 	UpdatedAt           time.Time `db:"updated_at"             json:"updated_at"`
+	UpdatedInSyobocalAt string    `db:"updated_in_syobocal_at" json:"updated_in_syobocal_at"`
 }
 
 func (title *Title) PreInsert(executor gorp.SqlExecutor) error {
