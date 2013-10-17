@@ -34,7 +34,11 @@ type Title struct {
 	ID                  int       `db:"id"                     json:"id"`
 	Name                string    `db:"name"                   json:"name"`
 	UpdatedAt           time.Time `db:"updated_at"             json:"updated_at"`
-	UpdatedInSyobocalAt string    `db:"updated_in_syobocal_at" json:"updated_in_syobocal_at"`
+	UpdatedInSyobocalAt time.Time `db:"updated_in_syobocal_at" json:"updated_in_syobocal_at"`
+}
+
+func (title *Title) IsValid() bool {
+	return title.Name != ""
 }
 
 func (title *Title) PreInsert(executor gorp.SqlExecutor) error {

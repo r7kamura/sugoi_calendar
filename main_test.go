@@ -45,7 +45,12 @@ func TestSugoiCalendarHandler(t *testing.T) {
 		Before(func() {
 			dbMap.DropTablesIfExists()
 			dbMap.CreateTablesIfNotExists()
-			dbMap.Insert(&Title{Name: "test"})
+			dbMap.Insert(
+				&Title{
+					Name: "test",
+					UpdatedInSyobocalAt: time.Date(1970, 1, 1, 9, 0, 0, 0, time.FixedZone("JST", 9 * 60 * 60)),
+				},
+			)
 		})
 
 		It("returns titles as JSON", func() {
@@ -64,7 +69,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"id":1,
 						"name":"test",
 						"updated_at":"1970-01-01T09:00:00+09:00",
-						"updated_in_syobocal_at":""
+						"updated_in_syobocal_at":"1970-01-01T09:00:00+09:00"
 					}
 				]`,
 			)
@@ -75,7 +80,12 @@ func TestSugoiCalendarHandler(t *testing.T) {
 		Before(func() {
 			dbMap.DropTablesIfExists()
 			dbMap.CreateTables()
-			dbMap.Insert(&Title{Name: "test"})
+			dbMap.Insert(
+				&Title{
+					Name: "test",
+					UpdatedInSyobocalAt: time.Date(1970, 1, 1, 9, 0, 0, 0, time.FixedZone("JST", 9 * 60 * 60)),
+				},
+			)
 		})
 
 		Context("with non-integer id", func() {
@@ -121,7 +131,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"id":1,
 						"name":"test",
 						"updated_at":"1970-01-01T09:00:00+09:00",
-						"updated_in_syobocal_at":""
+						"updated_in_syobocal_at":"1970-01-01T09:00:00+09:00"
 					}`,
 				)
 			})
@@ -139,7 +149,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 				response, _ := http.Post(server.URL + "/titles", "application/json", strings.NewReader(`{}`))
 				Expect(response.StatusCode).To(Equal, 400)
 				Expect(response.Header).To(HaveJSONContentType)
-				Expect(response.Body).To(BeReadableAs, `{"message":"title parameter is required"}`)
+				Expect(response.Body).To(BeReadableAs, `{"message":"Invalid parameters"}`)
 			})
 		})
 
@@ -164,7 +174,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 							"english":"test",
 							"hiragana":"てすと",
 							"name":"test",
-							"updated_in_syobocal_at":""
+							"updated_in_syobocal_at":"1970-01-01T09:00:00+09:00"
 						}`,
 					),
 				)
@@ -181,7 +191,7 @@ func TestSugoiCalendarHandler(t *testing.T) {
 						"id":1,
 						"name":"test",
 						"updated_at":"1970-01-01T09:00:00+09:00",
-						"updated_in_syobocal_at":""
+						"updated_in_syobocal_at":"1970-01-01T09:00:00+09:00"
 					}`,
 				)
 			})

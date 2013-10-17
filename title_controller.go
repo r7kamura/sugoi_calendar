@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"strconv"
+	"time"
 )
 
 type TitleController struct {
@@ -48,8 +49,9 @@ func (controller TitleController) Create() {
 		controller.RenderErrorJson(406, "Request body must be a JSON encoded value")
 		return
 	}
-	if givenTitle.Name == "" {
-		controller.RenderErrorJson(400, "title parameter is required")
+	time, err := time.Parse(time.RFC3339, givenTitle.UpdatedInSyobocalAt)
+	if err != nil {
+		controller.RenderErrorJson(400, "Invalid parameters")
 		return
 	}
 	title := &Title{
@@ -59,7 +61,11 @@ func (controller TitleController) Create() {
 		English: givenTitle.English,
 		Hiragana: givenTitle.Hiragana,
 		Name: givenTitle.Name,
-		UpdatedInSyobocalAt: givenTitle.UpdatedInSyobocalAt,
+		UpdatedInSyobocalAt: time,
+	}
+	if !title.IsValid() {
+		controller.RenderErrorJson(400, "Invalid parameters")
+		return
 	}
 	err = dbMap.Insert(title)
 	if err != nil {
