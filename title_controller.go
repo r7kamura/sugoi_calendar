@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 )
 
@@ -13,7 +12,6 @@ type TitleController struct {
 func (controller TitleController) Index() {
 	records, err := dbMap.Select(Title{}, `SELECT * FROM titles ORDER BY id DESC`)
 	if err != nil {
-		fmt.Println(err.Error())
 		controller.RenderErrorJson(500, "Failed to load titles from database")
 		return
 	}
@@ -32,7 +30,6 @@ func (controller TitleController) Show() {
 	}
 	record, err := dbMap.Get(Title{}, id)
 	if err != nil {
-		fmt.Println(err.Error())
 		controller.RenderErrorJson(500, "Failed to load record from database")
 		return
 	}
