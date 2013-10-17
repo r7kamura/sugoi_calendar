@@ -22,7 +22,6 @@ func init() {
 	}
 	dbMap = &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{tableType, tableCharacterSet}}
 	dbMap.AddTableWithName(Title{}, "titles").SetKeys(true, "id")
-	clock = &RealClock{}
 }
 
 type Title struct {
